@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Turing & Enigma — The code room</title>
+        <meta name="description" content="Explore Alan Turing's story, operate an Enigma simulator and experiment with real Python, offline.">
+        <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%23151e24'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='24' fill='%23f3c96b'%3EE%3C/text%3E%3C/svg%3E">
+    </head>
+    <body>
+        <header>
+            <a class="brand" href="#">T<span>/</span>E</a><span class="edition">THE CODE ROOM</span>
+            <nav aria-label="Main navigation">
+                <a href="#machine">Enigma</a>
+                <a href="#story">Alan Turing</a>
+                <a href="#python">Python lab</a>
+            </nav>
+            <span class="offline">ONLINE EDITION</span></header>
+<main>
+    <div class="intro">
+        <p class="eyebrow">MATHEMATICS · HISTORY · CODE</p>
+        <h1>Turing <i>&</i> Enigma</h1>
+        <p>A machine that concealed words. The people who found a way to read them.<br>Explore the history, then follow the logic yourself.</p>
+    </div>
+<section id="machine" class="workbench">
+    <div class="section-title">
+        <div>
+            <p class="eyebrow">01 / THE MACHINE</p>
+            <h2>Every letter changes the circuit.</h2>
+        </div>
+        <p id="status" role="status">Loading local Python…</p>
+    </div>
+<div class="machine-layout">
+    <div class="instrument">
+        <div class="instrument-top">
+            <span>ENIGMA I · REFLECTOR B</span>
+            <span>ROTOR WINDOWS</span>
+        </div>
+        <div id="windows" aria-label="Current rotor positions">A A A</div>
+        <div id="lamps" aria-label="Output lamps"></div>
+        <div class="separator">KEYBOARD</div>
+        <div id="keys" aria-label="Enigma keyboard"></div>
+        <p class="instrument-note">Press a key to advance the rotors and light its encrypted letter.</p>
+    </div>
+    <div class="controls">
+        <fieldset id="settings">
+            <legend>Starting settings</legend>
+            <div class="rotor-fields">
+                <label>Left rotor
+                    <select id="left"></select>
+                </label>
+                <label>Middle rotor
+                    <select id="middle"></select>
+                </label>
+                <label>Right rotor
+                    <select id="right"></select>
+                </label>
+            </div>
+            <div class="two">
+                <label>Window letters<input id="positions" value="AAA" maxlength="3" spellcheck="false">
+                </label>
+                <label>Ring letters<input id="rings" value="AAA" maxlength="3" spellcheck="false">
+                </label>
+            </div>
+            <label>Plugboard pairs<input id="plugs" placeholder="AB CD EF" spellcheck="false">
+            </label>
+            <p class="hint">Left → right. Rings: A = 01, B = 02. Each plugboard letter can appear only once.</p>
+        </fieldset>
+        <label for="message">Message</label>
+        <textarea id="message" rows="3" spellcheck="false" placeholder="Type a message, or use the keys…"></textarea>
+        <div class="actions">
+            <button id="encrypt" class="primary" disabled>Process message</button>
+            <button id="reset" disabled>Reset</button>
+        </div>
+        <p class="hint">Each run starts from the settings above. Keyboard presses recompute the complete message from those settings.</p>
+        <div class="readout">
+            <span class="eyebrow">PREPARED INPUT</span>
+            <div id="prepared">—</div>
+            <span class="eyebrow">OUTPUT</span>
+            <output id="result" aria-live="polite">—</output>
+        </div><div class="actions">
+            <button id="decrypt" disabled>Use output as input</button>
+            <button id="example" disabled>Try HELLOWORLD</button>
+        </div>
+        <p id="machine-error" class="error" role="alert"></p>
+    </div>
+</div>
+<details>
+    <summary>How to read the settings and decrypt a message</summary>
+      <p>The rotor order chooses three different wired wheels. Window letters choose their initial orientation; ring settings shift the wiring relative to those letters. The plugboard swaps pairs of letters before and after the rotor circuit.</p>
+      <p>To decrypt, keep the same starting settings, choose “Use output as input”, then “Process message”. Default settings turn HELLOWORLD into ILBDAAMTAZ and back again.</p>
+      <p>This teaching convention removes spaces and most punctuation, changes full stops to X, and converts Ä/Ö/Ü/ß to AE/OE/UE/SS. Numbers are omitted: spell them out first. Historical conventions varied. Decryption cannot automatically restore the original formatting.</p>
+</details>
+<details>
+        <summary>How the Rotors function</summary>
+      <p>A rotor contains 26 wires, one for each letter of the alphabet. Each wire connects a letter position on one side to a different position on the other. As the wheel rotates, it changes which wire lines up with the incoming letters.</p>
+      <p>Before each letter is encrypted, the rightmost rotor advances one position. Starting at AAA, your default simulator moves like this after pressing "A" five times:</p>
+      <div class="table-scroll">
+  <table class="rotor-table">
+    <thead>
+      <tr>
+        <th scope="col">Key pressed</th>
+        <th scope="col">Rotor windows after moving</th>
+        <th scope="col">Encrypted letter</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>A</td>
+        <td>AAB</td>
+        <td>B</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAC</td>
+        <td>D</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAD</td>
+        <td>Z</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAE</td>
+        <td>G</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAF</td>
+        <td>O</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>Notches make neighbouring rotors move. When a rotor reaches its notch position, the next keypress also advances the wheel to its left. The default notch settings for each rotor are as follows:</p>
+<div class="table-scroll">
+  <table class="rotor-table">
+    <thead>
+      <tr>
+        <th scope="col">Rotor Identifier</th>
+        <th scope="col">Rotor Wiring</th>
+        <th scope="col">Notch Position</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>I</td>
+        <td>'EKMFLGDQVZNTOWYHXUSPAIBRCJ'</td>
+        <td>Q</td>
+      </tr>
+      <tr>
+        <td>II</td>
+        <td>'AJDKSIRUXBLHWTMCQGZNPYFVOE'</td>
+        <td>E</td>
+      </tr>
+      <tr>
+        <td>III</td>
+        <td>'BDFHJLCPRTXVZNYEIWGAKMUSQO'</td>
+        <td>V</td>
+      </tr>
+      <tr>
+        <td>IV</td>
+        <td>'ESOVPZJAYQUIRHXLNFTGKDCMWB'</td>
+        <td>J</td>
+      </tr>
+      <tr>
+        <td>V</td>
+        <td>'VZBRGITYUPSDNHLXAWMJQOFECK'</td>
+        <td>Z</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>The wiring string lines up with the normal alphabet:</p>
+<p><b>Input:</b> ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+<p><b>Output:</b> EKMFLGDQVZNTOWYHXUSPAIBRCJ</p>
+<p>So A connects to E, B to K, C to M, and so on at the reference alignment. The rightmost rotor rotates once per letter, however, the middle rotor and leftmost rotor only rotate when a notch is reached. For example, with the default notch settings:</p>
+<div class="table-scroll">
+  <table class="rotor-table">
+    <thead>
+      <tr>
+        <th scope="col">Rotor Window</th>
+        <th scope="col">Notch Reached</th>
+        <th scope="col">Rotor Adances</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>ADV</td>
+        <td>Rotor III 'V'</td>
+        <td>Rightmost and Middle rotor advance once.</td>
+      </tr>
+      <tr>
+        <td>AEW</td>
+        <td>Rotor II 'E'</td>
+        <td>All three rotors advance once.</td>
+      </tr>
+      <tr>
+        <td>BFX</td>
+        <td>Double Stepping</td>
+        <td>The middle rotor has moved on two consecutive keypresses.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</details>
+<details>
+    <summary>
+        How the Ring Letters function
+    </summary>
+    <p>The ring letters change the alignment of a rotors internal wiring relative to the alphabet shown in its window. Therefore, you can think of a rotor as two connected parts; an outer alphabet ring labelled A to Z, and an inner core containing the wires that scrambles the letters.</p>
+    <p>For example:</p>
+    <div class="table-scroll">
+  <table class="rotor-table">
+    <thead>
+      <tr>
+        <th scope="col">Window Letter</th>
+        <th scope="col">Ring Setting</th>
+        <th scope="col">Wiring Alignment</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>A</td>
+        <td>A</td>
+        <td>Default alignment.</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>B</td>
+        <td>Wiring shifted backwards by one position.</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>C</td>
+        <td>Wiring shifted backwards by two positions.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>This means that two different Enigma machines can both display 'AAA' for their window letters, but encrypts a message differently if their ring settings differ. For example, if we set the Window letters to "AAA" and the Ring letters to "AAB" and press "A" six times we obtain:</p>
+<div class="table-scroll">
+  <table class="rotor-table">
+    <thead>
+      <tr>
+        <th scope="col">Key</th>
+        <th scope="col">Rotor</th>
+        <th scope="col">Encrypted Letter</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>A</td>
+        <td>AAB</td>
+        <td>U</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAC</td>
+        <td>B</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAD</td>
+        <td>D</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAE</td>
+        <td>Z</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAF</td>
+        <td>G</td>
+      </tr>
+      <tr>
+        <td>A</td>
+        <td>AAG</td>
+        <td>O</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</details>
+<details>
+    <summary>How the Plugboards work</summary>
+    <p>The plugboard swaps letters in pairs, adding another layer of scrambling before and after the rotors. For example, entering "AB", "CD" and "EF" creates these connections:</p>
+    <div class="table-scroll">
+  <table class="rotor-table">
+    <thead>
+      <tr>
+        <th scope="col">Letter</th>
+        <th scope="col">Swapped To</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>A</td>
+        <td>B</td>
+      </tr>
+      <tr>
+        <td>C</td>
+        <td>D</td>
+      </tr>
+      <tr>
+        <td>E</td>
+        <td>F</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>Letters without a connection stay unchanged at the plugboard, but they still get scrambled by the rotors. When you press A, with AB CD configured, the plugboard changes A → B. B enters the rotors, travels through the reflector, and returns through the rotors. 
+The returning letter passes through the plugboard again. If it returns as C, the plugboard changes C → D, and D lights up.
+That final example is conditional—the returning letter depends on your rotor settings.</p>
+</details>
+</section>
+<section id="story" class="story">
+    <div>
+        <p class="eyebrow">02 / BEHIND THE BREAKTHROUGH</p>
+        <h2>Alan Turing.<br>Beyond the machine.</h2>
+        <p class="large">1912–1954</p>
+        <p>Turing’s work connected abstract mathematics with the possibility of machines that could carry out general computations.</p>
+        <img src="images/Alan-Turing.jpg" alt="AI-generated portrait of Alan Turing" class="turing-portrait">
+    </div>
+    <div class="story-copy">
+        <article><span class="year">1936</span>
+            <h3>What does it mean to compute?</h3>
+            <p>Turing described an abstract computing machine. His work helped establish both the power and the limits of algorithms, laying foundations for computer science.</p>
+        </article>
+        <article><span class="year">1939–1945</span>
+            <h3>A collective achievement</h3>
+            <p>At Bletchley Park, Turing played a major part in attacking German naval Enigma. He developed the logic behind the British Bombe; Gordon Welchman’s diagonal board made it much more effective.</p>
+            <p>He did not invent Enigma or break it alone. Polish mathematicians Marian Rejewski, Jerzy Różycki and Henryk Zygalski made crucial earlier breakthroughs. Intercept operators, engineers, linguists and many other codebreakers made the wartime effort possible.</p>
+        </article>
+        <article><span class="year">1950</span>
+            <h3>Can machines think?</h3>
+            <p>His paper “Computing Machinery and Intelligence” proposed the imitation game, now associated with the Turing test, as a way to investigate machine intelligence.</p>
+        </article><article><span class="year">1952–1954</span>
+            <h3>A life cut short</h3>
+            <p>In 1952, Turing was prosecuted for a homosexual relationship and subjected to hormone treatment. He died in 1954, aged 41. His scientific achievements and the injustice he suffered are both part of his story.</p>
+        </article>
+    </div>
+</section>
+<section class="explanation">
+    <p class="eyebrow">THE IMPORTANT DISTINCTION</p>
+    <h2>Enigma encrypted. The Bombe searched.</h2>
+    <div class="two">
+        <p>Enigma sent an electrical signal through a plugboard, three rotors, a reflector, and back again. The right rotor advanced before each letter. The middle rotor could advance on two successive keypresses: the “double step”.</p>
+        <p>The Bombe tested possible Enigma settings against a suspected fragment of plaintext, called a <em>crib</em>. It eliminated contradictions and left candidates for further checking. It did not simply translate any intercepted message at the push of a button.</p>
+    </div>
+    <p class="hint">This simulator models three rotors selected from I–V and reflector B.</p>
+</section>
+<section id="python" class="lab">
+    <div class="section-title">
+        <div><p class="eyebrow">03 / THE PYTHON LAB</p>
+            <h2>Change the code. Follow the result.</h2>
+        </div><a href="enigma.py" download>Download the engine ↓</a></div>
+        <p>The same Python engine powers the machine above. Edit this experiment and run it locally in your browser. Each run begins with a fresh Python namespace.</p>
+        <div class="editor-grid">
+            <div>
+                <label for="code">experiment.py</label>
+                <textarea id="code" spellcheck="false" aria-label="Python code editor"></textarea>
+                <div class="actions">
+                    <button id="run" class="primary" disabled>Run Python</button>
+                    <button id="stop">Restart Python</button>
+                    <button id="restore">Restore example</button>
+                </div>
+            </div>
+            <div>
+                <label for="console">Output</label>
+                <pre id="console" role="status">Python is starting…</pre>
+                <p class="hint">Use print() to show results. Enigma and prepare are already available. Restart Python to stop a long-running experiment.</p>
+            </div>
+        </div>
+        <details>
+            <summary>What does each line do?</summary>
+            <p><code>Enigma(...)</code> creates a machine with your chosen settings. <code>prepare(...)</code> converts the text to the supported alphabet. <code>machine.process(...)</code> advances the rotors and encrypts each letter. <code>print(...)</code> displays a value.</p>
+            <p>To decrypt, create a <strong>new</strong> machine with the same starting settings. Reusing the already-advanced machine will give a different result.</p>
+        </details>
+        <details>
+            <summary>Read the complete Python engine</summary>
+            <pre id="engine-source"></pre>
+        </details>
+    </section>
+<footer>
+    <h3>Keep exploring</h3>
+    <p>The website and Python experiments work offline. These historical references require an internet connection.</p>
+    <div class="sources">
+        <a href="https://www.turing.org.uk/publications/lausannebio.html">Andrew Hodges · Turing’s biography</a>
+        <a href="https://bombe.org.uk/enter-turing-and-welchman/">Bombe reconstruction · Turing & Welchman</a>
+        <a href="https://www.cryptomuseum.com/crypto/enigma/working.htm">Crypto Museum · Enigma explained</a>
+        <a href="https://www.cryptomuseum.com/crypto/enigma/wiring.htm">Crypto Museum · Rotor wiring</a>
+    </div>
+</footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

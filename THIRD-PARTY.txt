@@ -1,0 +1,10 @@
+Bundled runtime: Pyodide 0.27.7, https://pyodide.org/
+Source distribution: https://cdn.jsdelivr.net/pyodide/v0.27.7/full/
+Pyodide is distributed under the Mozilla Public License 2.0.
+See runtime/LICENSE for the distributed notice and license information.
+Python and runtime components retain their upstream licenses.
+Source code: https://github.com/pyodide/pyodide/tree/0.27.7
+Python source: https://github.com/python/cpython
+
+Historical references appear in the website footer. Historical content is
+paraphrased, and the site is not affiliated with the referenced institutions.
